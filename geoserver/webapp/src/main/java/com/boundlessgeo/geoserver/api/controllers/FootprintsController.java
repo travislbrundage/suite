@@ -43,8 +43,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import static com.google.common.collect.Iterators.transform;
+import static org.geoserver.catalog.Predicates.equal;
+
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
 import org.opengis.geometry.Geometry;
 
 import com.google.common.base.Function;
@@ -75,23 +78,24 @@ import java.util.List;
 @RequestMapping("/api/footprints")
 public class FootprintsController extends ApiController {
     
+    private static boolean WELLFORMED = true;
+    
     @Autowired
     public FootprintsController(GeoServer geoServer) {
         super(geoServer);
     }
     
     // Issue GET request in /footprints/<workspace>?bbox=x1,x2,y1,y2
-    @RequestMapping(value="/{wsName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value="/{wsName}", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public @ResponseBody
-    FeatureJSON exportLayer(@PathVariable String wsName, HttpServletResponse response,
-            @RequestParam("bbox") String bbox) throws IOException{
-        // TODO: Use the bbox specified in the get request
-        Envelope bboxEnv = getBboxFromString(bbox);
+    void getLayersInBbox(@PathVariable String wsName, @RequestParam("bbox") String bbox,
+            HttpServletResponse response) throws IOException{
         Catalog cat = geoServer.getCatalog();
         
+        final Envelope bboxEnv = getBboxFromString(bbox);
         final Iterator<LayerInfo> layers = findAllLayersInWorkspace(wsName, cat);
-        
         final SimpleFeatureBuilder featureBuilder = makeBuilder(wsName);
         
         final Iterator<SimpleFeature> featuresFromLayers = 
@@ -101,6 +105,10 @@ public class FootprintsController extends ApiController {
                     featureBuilder.add(JTS.toGeometry(layer.getResource().getLatLonBoundingBox()));
                     featureBuilder.add(layer.getName());
                     featureBuilder.add(layer.getTitle());
+                    // Only use the bbox if the parameter is well formed
+                    if (WELLFORMED == true) {
+                        // TODO: Use the bbox specified in the get request
+                    }
                     return featureBuilder.buildFeature(null);
                 }
         });
@@ -115,29 +123,31 @@ public class FootprintsController extends ApiController {
         
         FeatureJSON json = new FeatureJSON();
         json.writeFeatureCollection(featureCollection, response.getWriter());
-        return json;
     }
     
     private Envelope getBboxFromString(String bbox) {
-        Integer x1=0,y1=0,x2=0,y2=0;
+        int[] env = new int[4];
         String[] integers = bbox.split(",");
         
-        // TODO: Handle the correct bbox specification in GET request
-        // Currently just defaulting to a bbox of (0,0,0,0) [nothing] if malformed
         if (integers.length == 4) {
-            x1 = Integer.parseInt(integers[0]);
-            y1 = Integer.parseInt(integers[1]);
-            x2 = Integer.parseInt(integers[2]);
-            y2 = Integer.parseInt(integers[3]);
+            for (int i = 0; i < integers.length; i++) {
+                try {
+                    env[i] = Integer.parseInt(integers[i]);
+                } catch (NumberFormatException e) {
+                    WELLFORMED = false;
+                    return null;
+                }
+            }
         } else {
-            System.out.println("Malformed bbox request");
+            WELLFORMED = false;
+            return null;
         }
         
-        return new Envelope(x1,y1,x2,y2);
+        return new Envelope(env[0],env[1],env[2],env[3]);
     }
     
     private Iterator<LayerInfo> findAllLayersInWorkspace(String wsName, Catalog cat) {
-        return cat.list(LayerInfo.class, Predicates.equal("resource.store.workspace.name", wsName));
+        return cat.list(LayerInfo.class, Predicates.equal("resource.namespace.prefix", wsName));
     }
     
     private SimpleFeatureBuilder makeBuilder(String wsName) {
@@ -149,6 +159,7 @@ public class FootprintsController extends ApiController {
         typebuilder.add( "geometry", Geometry.class );
         typebuilder.add( "name", String.class );
         typebuilder.add( "title", String.class );
+        typebuilder.add( "bbox", String.class );
         
         SimpleFeatureType type = typebuilder.buildFeatureType();
         return new SimpleFeatureBuilder(type);
