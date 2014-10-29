@@ -3,6 +3,7 @@
  */
 package com.boundlessgeo.geoserver.api.controllers;
 
+// TODO: Clean up imports
 import com.boundlessgeo.geoserver.api.exceptions.BadRequestException;
 import com.boundlessgeo.geoserver.json.JSONArr;
 import com.boundlessgeo.geoserver.json.JSONObj;
@@ -85,42 +86,30 @@ public class FootprintsController extends ApiController {
     public @ResponseBody
     FeatureJSON exportLayer(@PathVariable String wsName, HttpServletResponse response,
             @RequestParam("bbox") String bbox) throws IOException{
+        // TODO: Use the bbox specified in the get request
         Envelope bboxEnv = getBboxFromString(bbox);
-
         Catalog cat = geoServer.getCatalog();
-        final Iterator<LayerInfo> layers = 
-                cat.list(LayerInfo.class, Predicates.equal("resource.store.workspace.name", wsName));
         
-        SimpleFeatureTypeBuilder typebuilder = new SimpleFeatureTypeBuilder();
-        // TODO: set the proper values
-        typebuilder.setName(wsName);
-        typebuilder.setNamespaceURI( "http://" + wsName );
-        typebuilder.setSRS( "EPSG:4326" );
+        final Iterator<LayerInfo> layers = findAllLayersInWorkspace(wsName, cat);
         
-        typebuilder.add( "geometry", Geometry.class );
-        typebuilder.add( "name", String.class );
-        typebuilder.add( "title", String.class );
-        
-        SimpleFeatureType type = typebuilder.buildFeatureType();
-        final SimpleFeatureBuilder featurebuilder = new SimpleFeatureBuilder(type);
+        final SimpleFeatureBuilder featureBuilder = makeBuilder(wsName);
         
         final Iterator<SimpleFeature> featuresFromLayers = 
                 transform(layers, new Function<LayerInfo, SimpleFeature>() {
-            @Override
-            public SimpleFeature apply(LayerInfo layer) {
-                featurebuilder.add(JTS.toGeometry(layer.getResource().getLatLonBoundingBox()));
-                featurebuilder.add(layer.getName());
-                featurebuilder.add(layer.getTitle());
-                return featurebuilder.buildFeature(null);
-            }
+                @Override
+                public SimpleFeature apply(LayerInfo layer) {
+                    featureBuilder.add(JTS.toGeometry(layer.getResource().getLatLonBoundingBox()));
+                    featureBuilder.add(layer.getName());
+                    featureBuilder.add(layer.getTitle());
+                    return featureBuilder.buildFeature(null);
+                }
         });
         
-        
-        FeatureCollection featureCollection = new DefaultFeatureCollection(null, null) {
-            // TODO: Did I do this right?
-            @Override
-            public SimpleFeatureIterator features() {
-                return new DelegateSimpleFeatureIterator(featuresFromLayers);
+        FeatureCollection featureCollection = 
+                new DefaultFeatureCollection(null, featureBuilder.getFeatureType()) {
+                @Override
+                public SimpleFeatureIterator features() {
+                    return new DelegateSimpleFeatureIterator(featuresFromLayers);
             }
         };
         
@@ -133,6 +122,8 @@ public class FootprintsController extends ApiController {
         Integer x1=0,y1=0,x2=0,y2=0;
         String[] integers = bbox.split(",");
         
+        // TODO: Handle the correct bbox specification in GET request
+        // Currently just defaulting to a bbox of (0,0,0,0) [nothing] if malformed
         if (integers.length == 4) {
             x1 = Integer.parseInt(integers[0]);
             y1 = Integer.parseInt(integers[1]);
@@ -145,17 +136,16 @@ public class FootprintsController extends ApiController {
         return new Envelope(x1,y1,x2,y2);
     }
     
-    private CloseableIterator<LayerInfo> findAllLayersInWorkspace(String wsName, Catalog cat) {
+    private Iterator<LayerInfo> findAllLayersInWorkspace(String wsName, Catalog cat) {
         return cat.list(LayerInfo.class, Predicates.equal("resource.store.workspace.name", wsName));
     }
     
     private SimpleFeatureBuilder makeBuilder(String wsName) {
         SimpleFeatureTypeBuilder typebuilder = new SimpleFeatureTypeBuilder();
-        // TODO: set the proper values
+        // TODO: Set the correct values here
         typebuilder.setName(wsName);
         typebuilder.setNamespaceURI( "http://" + wsName );
         typebuilder.setSRS( "EPSG:4326" );
-        
         typebuilder.add( "geometry", Geometry.class );
         typebuilder.add( "name", String.class );
         typebuilder.add( "title", String.class );
