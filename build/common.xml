@@ -273,11 +273,15 @@ Common build targets.
   @param flags Additional sphinx build flags.
   -->
   <target name="sphinx">
+      <condition property="flags" value="-t enterprise" else="-t basic">
+        <istrue value="${enterprise}"/>
+      </condition>
+      
       <property name="builder" value="html"/>
       <property name="doctrees" value="${basedir}/target/doctrees"/>
       <property name="srcdir" value="."/>
       <property name="outdir" value="${basedir}/target/${builder}"/>
-      <property name="flags" value=""/>
+
       <echo message="sphinx-build -A suite_version=${suite.version} ${sphinx.flags} ${flags} -b ${builder} -d ${doctrees} ${srcdir} ${outdir}"/>
       <exec executable="sphinx-build" dir="${dir}">
         <arg line="-A suite_version=${suite.version} ${sphinx.flags} ${flags} -b ${builder} -d ${doctrees} ${srcdir} ${outdir}"/>

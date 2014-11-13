@@ -13,6 +13,11 @@
     </condition>
   </target>
 
+ <!-- 
+  Runs a sphinx build html
+
+  @param flags Additional sphinx build flags (defaults to -t=basic)
+  -->
   <target name="build-html"
     description="Build html docs">
     <antcall target="sphinx">

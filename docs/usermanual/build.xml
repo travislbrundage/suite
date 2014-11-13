@@ -3,7 +3,9 @@
     <import file="../common.xml"/>
 
     <target name="build" depends="init">
-        <antcall target="build-html"/>
+        <antcall target="build-html">
+<!--          <param name="flags" value="-t=enterprise"/>-->
+        </antcall>
         <antcall target="build-pdf"/>
     </target>
 

@@ -1,36 +1,36 @@
-Upgrade
-=======
+.. _intro.installation.war.upgrade:
 
+Upgrading to OpenGeo Suite Enterprise
+=====================================
 
-Upgrade to Enterprise
----------------------
+This section describes how to upgrade OpenGeo Suite to OpenGeo Suite Enterprise.
 
-An upgrade to Suite 4.5 can be performed in place.
+.. note:: OpenGeo Suite Enterprise can only be obtained through `Boundless <http://boundlessgeo.com>`_. Please `contact us <http://boundlessgeo.com/about/contact-us/sales/>`_ for information on how to purchase OpenGeo Suite Enterprise.
 
-#. Download the additional *Composer* component.
+.. todo:: Details needed.
 
-#. Download the replacement:
-   
-   * dashboard.war
-   * geoserver.war
-   * opengeo-docs
-   
-#. Stop Tomcat
+#. Download the additional files as part of the Enterprise bundle for application servers.
+
+#. Ensure GeoServer is configured with an external data directory. See the section on :ref:`intro.installation.war.install` for how to do this.
+
+   .. warning:: Failure to use an external data directory may cause you to lose all of your data and settings.
+
+#. Undeploy the following web applications:
+
+   .. todo:: Details needed.
 
 #. Remove the following files and directories:
    
-   * webapps/dashboard.war
-   * webapps/dashboard
-   * webapps/opengeo-docs
+   .. todo:: Details needed.
 
-#. Unpack the dashboard and documentation replacements into webapps:
+#. Unpack the following content:
 
-   * dashboard.war
-   * opengeo-docs
+   .. todo:: Details needed.
 
-#. Unzip composer.zip into the existing :file:`webapps/geoserver` folder
+#. Restart Tomcat.
 
-#. Restart Tomcat
+To verify that the upgrade was successful:
 
-#. Verify that dashboard contains an entry for *Composer* and that the link functions.
+#. Navigate to the Dashboard, and verify that there is an entry for :guilabel:`Composer`.
 
+#. Click the link to open the Composer. The application should load successfully.

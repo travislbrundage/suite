@@ -4,8 +4,18 @@ OpenGeo Suite is a full geospatial software stack that helps you compose, style,
 OpenGeo Suite User Manual
 -------------------------
 
-This User Manual will help you get the most out of OpenGeo Suite.
+.. only:: basic
 
+   This User Manual will help you get the most out of OpenGeo Basic Suite.
+
+.. only:: enterprise
+    
+   This User Manual will help you get the most out of OpenGeo Enterprise Suite.
+
+.. only:: (not basic) and (not enterprise )
+
+   This User Manual will help you get the most out of Suite.
+   
 :ref:`whatsnew`
   See what's new in OpenGeo Suite |version|.
 

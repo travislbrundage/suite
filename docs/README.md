@@ -3,14 +3,18 @@
 This module builds all of the documentation for suite. All documentation is build with 
 [Sphinx](http://sphinx-doc.org/).
 
-This module is broken into multiple sub modules for each documentation project. To build all the documentation invoke ant from this directory.
+This module is broken into multiple sub modules for each documentation project. To build the documentation included with suite invoke ant from this directory.
 
-    % ant
+    % ant basic
+    
+To build documentation with additional enterprise components:
+
+    % ant enterprise
 
 Or to build a specific sub module change directory to that sub module and invoke ant.
 
     % cd usermanual
-    % ant
+    % ant basic
 
 # Building PDFs
 

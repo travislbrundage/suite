@@ -3,45 +3,37 @@
 Uninstallation
 ==============
 
-This document describes how to uninstall WAR distribution of OpenGeo Suite. During installation a WAR was copied into the application server webapps folder, and deployed into a folder.
+This section describes how to uninstall OpenGeo Suite for Application Servers.
 
-Management Console Undeploy
----------------------------
+.. note:: These instructions assume Tomcat, but the steps required for each application server will be similar to the ones presented here.
 
-These instructions use the Tomcat Application Server as an example. The steps required for each application server will be similar to the ones presented here.
+Undeploying applications via the Tomcat Management Console
+----------------------------------------------------------
 
-#. From the management console, each web application can be started, stopped, reloaded and undeployed.
-   
-#. From the management click :guilabel:`Undeploy` next to each OpenGeo Suite web application:
-   
-   * opengeo-docs
-   * dashboard
-   * geoserver
-   * geoexplorer
-   * GeoWebCache
-   
-#. The management console will remove the folder and associated WAR file for each web application.
-   
-#.  Undeploying will not delete your external GEOSERVER_DATA_DIRECRTORY.
-    
-    Should you wish to delete this directory, you will need to do it manually.
-    
-Manual Undeploy
----------------
+#. Open the Tomcat Management Console.
 
-These instructions use the Tomcat Application Server as an example. The steps required for each application server will be similar to the ones presented here.
+#. Click :guilabel:`Undeploy` next to each OpenGeo Suite web application.
 
-#. Stop the application service, to prevent it redeploying the application while we are cleaning up.
+#. The Tomcat Management Console will remove the deployed application and associated WAR file for each web application.
 
-#. Locate the webapps folder and remove the following files:
+   .. note:: Undeploying will not delete your data directory if you have set it up to be external to the application.
+
+Undeploying application manually
+--------------------------------
+
+#. Stop Tomcat.
+
+#. Locate the :file:`webapps` directory and delete the following files:
 
    * :file:`opengeo-docs.war`
    * :file:`dashboard.war`
    * :file:`geoserver.war`
    * :file:`geoexplorer.war`
    * :file:`geowebcache.war`
+
+   .. todo:: Might be others.
    
-#. Remove the following folders
+#. Delete the associated directories:
 
    * :file:`opengeo-docs`
    * :file:`dashboard`
@@ -49,8 +41,8 @@ These instructions use the Tomcat Application Server as an example. The steps re
    * :file:`geoexplorer`
    * :file:`geowebcache`
 
-#. Restart the application server.
+   .. todo:: Might be others.
 
-#.  Undeploying will not delete your external GEOSERVER_DATA_DIRECRTORY.
-    
-    Should you wish to delete this directory, you will need to do it manually.
+#. Restart the application server (if desired).
+
+   .. note:: Undeploying will not delete your data directory if you have set it up to be external to the application.

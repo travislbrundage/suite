@@ -1,38 +1,28 @@
-Extensions
-==========
+.. _intro.installation.war.extensions:
 
-Extensions are distributed as individual :file:`zip` files which can be unpacked into your GeoServer :file:`libs` folder.
+Installing extensions
+=====================
 
-Using the WPS extension as an example:
+GeoServer :ref:`extensions <intro.extensions>` are distributed as a separate archive. Each extension is contained in a directory inside the archive. Files contained in these directories can be manually extracted.
 
-#. Locate your application server :file:`webapps` folder and navigate to :file:`webapps/geoserver/WEB-INF/lib`.
+To install an extension:
 
-#. Unzip the :file:`opengeo-extension.zip` and locate the :file:`wps` folder.
-   
-   At the time of writing the wps-extension consisted of the following files.
+#. Extract the contents of the OpenGeo Suite extensions archive.
 
-   * gs-web-wps-2.6-SNAPSHOT.jar
-   * gs-wps-core-2.6-SNAPSHOT.jar
-   * gt-process-geometry-12-SNAPSHOT.jar
-   * gt-xsd-wps-12-SNAPSHOT.jar
-   * net.opengis.wps-12-SNAPSHOT.jar
-   * serializer-2.7.1.jar
-   
-#. Copy these :file:`jar` files into the :file:`webapps/geoserver/WEB-INF/lib` directory.
-   
-   Windows: You may be warned when replacing files that are already present. This is expected as several extensions make use of the same :file:`jar` files resulting in duplication.
-  
+#. Locate the directory that contains the extension to install (such as :file:`wps` for the WPS extension).
+
+#. Copy the files in that directory to the GeoServer library path. This path is often :file:`webapps/geoserver/WEB-INF/lib`, where :file:`webapps` is the application server's web applications directory.
+
+   .. note:: You may be warned about overwriting existing files. This is okay.
+
 #. Restart GeoServer.
 
-   * Restart your application server; or
-   * From the application manager console you reload :guilabel:`geoserver`.
-      
-     .. figure:: img/reload.png
+   .. figure:: img/reload.png
         
-        Application Manager: Reload GeoServer
+      Reloading GeoServer via the Tomcat Management Console
 
-#. From the GeoServer Admin welcome page confirm that :guilabel:`WPS 1.0` is listed as a :guilabel:`Service Capability`.
-      
-     .. figure:: img/wps.png
+#. Confirm that the extension was installed properly. Typically, the feature will be displayed on the GeoServer admin Welcome page, or as an available data source.
+
+   .. figure:: img/wps.png
         
-        GeoServer WPS Service Capability
+      WPS extension installed

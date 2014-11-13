@@ -1,16 +1,18 @@
-Update
-======
+.. _intro.installation.war.update:
 
-Update from Suite 4.1.1
------------------------
+Updating web applications
+=========================
 
-#. Ensure your application server is configured with an external GEOSERVER_DATA_DIRECTORY.
-   
-   This step ensures that no geoserver, geowebacache or geoexplorer configuration information is maintained in your webapps folder.
-   
-#. Uninstall Suite 4.1.1 wars: :doc:`uninstall`
+To update OpenGeo Suite applications to a newer version:
 
-#. Restart Tomcat. This will allow memory used by Suite 4.1.1 to be reclaimed (preventing errors during Suite 4.5 installation).
+#. First, ensure GeoServer is configured with an external data directory. See the section on :ref:`intro.installation.war.install` for how to do this.
 
-#. Install Suite 4.5 wars: :doc:`install`
+   .. warning:: Failure to use an external data directory may cause you to lose all of your data and settings.
 
+#. Uninstall existing web applications. Please see the section on :ref:`intro.installation.war.uninstall` for more details.
+
+#. Restart Tomcat.
+
+#. Deploy new web applications. Please see the section on :ref:`intro.installation.war.install` for more details.
+
+   .. note:: Be aware that any extensions that have been manually installed will need to be installed again.

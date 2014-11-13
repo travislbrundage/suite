@@ -3,16 +3,37 @@
 Installing
 ==========
 
-OpenGeo Suite is compatible with a number of application servers, among them Jetty, JBoss, and WebSphere. One of the most popular platforms is `Apache Tomcat <http://tomcat.apache.org/>`_. Tomcat is available for all operating systems and is a stable and well-tested solution.
+OpenGeo Suite is compatible with a number of application servers, among them Jetty, Tomcat, JBoss, and WebSphere. The most popular application server, and the most recommended is `Tomcat <http://tomcat.apache.org/>`_. Tomcat is available for all operating systems.
 
-Tomcat Management Console
--------------------------
+The following sections will assume that Tomcat is used, although most of the instructions and recommended strategies will also apply to other application servers with minimal alteration. 
 
-The following sections will assume that Tomcat is used, although most of the instructions and recommended strategies will also apply to other application servers with minimal alterations.
+System requirements
+-------------------
 
-#. The tomcat manager has an upper limit on the size of WAR files that can be deployed.
+OpenGeo Suite requires the use of Java 7 as a minimum. Either **Oracle JRE 7** or **OpenJDK 7** is supported.
+
+.. for reference http://docs.geoserver.org/latest/en/user/installation/java.html
+
+Other system requirements are the same as for other operating systems:
+
+* :ref:`Windows <intro.installation.windows.install>`
+* :ref:`OS X <intro.installation.mac.install>`
+* :ref:`Ubuntu <intro.installation.ubuntu.install>`
+* :ref:`Red Hat / CentOS <intro.installation.redhat.install>`
+
+Deploying with Tomcat
+---------------------
+
+This section will show how to deploy the web applications to Tomcat.
+
+Increasing the maximum application size
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Tomcat Management Console has an upper limit on the size of WAR files that can be deployed. This will need to be changed in order to deploy many of the OpenGeo Suite web applications.
    
-   To increase this limit navigate to :file:`$CATALINA_BASE/webapps/manager/WEB-INF/web.xml` and edit the **multipart-config** parameters:
+#. Open the :file:`$CATALINA_BASE/webapps/manager/WEB-INF/web.xml` file in a text editor.
+
+#. Edit the ``*multipart-config`` parameters as follows:
    
    .. code-block:: xml
       
@@ -23,174 +44,94 @@ The following sections will assume that Tomcat is used, although most of the ins
          <file-size-threshold>0</file-size-threshold>
        </multipart-config>
 
-#. OpenGeo Suite requires the use of Java 7 as a minimum.
+#. Save and close this file.
 
-   * Oracle JDK 7
-   * Open JDK 7
+Increasing available memory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   
-   .. for reference http://docs.geoserver.org/latest/en/user/installation/java.html
+OpenGeo Suite requires more memory to be allocated on the application server. Increase both the heap space (used for data) and the PermGen space (used to load web applications).
 
-#. Increase the memory made available to your application server. Increase both the heap space (used for data) and the PermGen space (used to load web applications).
+Linux / OS X:
 
-   For Tomcat these settings are managed by:
-   
-   * Linux: Create a :file:`$CATALINA_BASE/bin/setenv.sh`:
-      
-     .. code-block:: sh
+#. Create a :file:`$CATALINA_BASE/bin/setenv.sh` file if it doesn't already exist.
+
+#. Add the following line:
+
+   .. code-block:: sh
+
+      export CATALINA_OPTS = "-Xmx1024m -XX:MaxPermSize=128m"
+
+#. Save and close the file.
+
+#. Restart Tomcat.
+
+Windows:
+
+#. Create a :file:`$CATALINA_BASE/bin/setenv.bat` file if it doesn't already exist.
+
+#. Add the following line:
+
+   .. code-block:: sh
+
+      set CATALINA_OPTS = "-Xmx1024m -XX:MaxPermSize=128m"
+
+#. Save and close the file. 
+
+#. As an alternative you can configure these settings in the Tomcat Properties available in the from the task bar:
      
-        export CATALINA_OPTS = "-Xmx1024m -XX:MaxPermSize=128m"
-        
-   * Windows: Create a :file:`setenv.bat` on windows:
-      
-     .. code-block:: bat
-        
-        set CATALINA_OPTS = "-Xmx1024m -XX:MaxPermSize=128m"
+   * :guilabel:`Java Options`: Append :kbd:`-XX:MaxPermSize=128m`
+   * :guilabel:`Maximum memory pool`: :kbd:`1024 MB`
      
-     As an alternative you can configure these settings in the Tomcat Properties available in the from the task bar.
-     
-     * :guilabel:`Java Options`: append :kbd:`-XX:MaxPermSize=128m`
-     * :guilabel:`Maximum memory pool`: :kbd:`2014 MB`
-     
-     .. figure:: img/tomcat-windows.png
+   .. figure:: img/tomcat-windows.png
         
-        Tomcat 8.0 Properties : Java Options and Memory Pool
+      Tomcat memory options
 
-#. Restart Tomcat, and open the management console: 
+#. Restart Tomcat.
 
-   * http://localhost:8080/manager/
-   
-#. Locate the :guilabel:`Deploy` heading and click on the :guilabel:`Browse` button to locate the :file:`geoserver.war` file.
+Deploying applications
+~~~~~~~~~~~~~~~~~~~~~~
 
-     .. figure:: img/deploy-browse.png
+There are two ways to deploy applcations:
+
+* Manually
+* Through the `Tomcat Management Console <http://tomcat.apache.org/tomcat-7.0-doc/manager-howto.html>`_.
+
+For deploying manually, web applications can often deployed by copying the individual WAR files to the :file:`webapps` directory. You may have to restart the container service afterwards.
+
+For deploying using Tomcat Management Console:
+
+#. Open the Management Console (often available at ``http://localhost:8080/manager/html``).
+
+#. Locate the :guilabel:`Deploy` heading and click the :guilabel:`Browse` button.
+
+   .. figure:: img/deploy-browse.png
         
-        Tomcat Manager : War file to deploy
-        
-#. Click on :guilabel:`Deploy` and white while the WAR file is uploaded and unpacked into the :file:`webapps` folder.
+      Deploying a web application
 
-#. Repeat this process as needed for:
+#. Select the web application file to deploy.
+
+#. Click :guilabel:`Deploy`. The WAR file will be uploaded and unpacked into the :file:`webapps` folder.
+
+#. Repeat this process as needed for every web application to be deployed.
    
-   * dashboard.war
-   * geoexplorer
-   * geoserver.war
-   * geowebcache.war
+Externalizing the GeoServer data directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#. WAR distribution of documentation is not available. Unzip opengeo-docs.zip into the :file:`webapps` folder:
+GeoServer includes a built-in data directory used to manage configuration information. To facilitate updating and prevent data loss, it is highly recommended to move the data directory to an location external to the application itself.
 
-  * opengeo-docs
+#. Stop Tomcat (or just GeoServer).
 
-#. Out of the box geoserver includes a built-in data directory used to manage configuration information.
+#. Move the :file:`geoserver/WEB-INF/data` directory to an external location. Here are some suggested locations:
    
-   To facilitate updating, and for application serves that empty out the webapps folder each restart, we will move to an external data directory configuration.
-   
-   Copy the :file:`geoserver/WEB-INF/data` folder to an external location:
-   
-   * linux: :file:`/var/lib/opengeo/geoserver`
-   * windows: :file:`C:\\ProgramData\\Boundless\\OpenGeo\\geoserver`
-   * osx: :file:`/Users/opengeo/geoserver_data`
+   * **Linux**: :file:`/var/lib/opengeo/geoserver`
+   * **Windows**: :file:`C:\\ProgramData\\Boundless\\OpenGeo\\geoserver`
+   * **OS X**: :file:`/Users/opengeo/geoserver_data`
 
-#. Locate :file:`geoserver/WEB-INF/web.xml` and change the GEOSERVER_DATA_DIRECTORY configuration to point to the new location.
+#. Open :file:`geoserver/WEB-INF/web.xml` in a text editor.
 
-#. In the same fashion update :file:`geowebcache/WEB_INF/web.xml` to point to a distinct cache location.
+#. Change the ``GEOSERVER_DATA_DIRECTORY`` parameter to point to the new directory location.
 
-Manual Deploy
--------------
+   .. note:: For similar reasons, it is recommended to do the same thing with the GeoWebCache cache location. This new location can be set in the :file:`geowebcache/WEB_INF/web.xml` file.
 
-Web applications are usually deployed by copying the individual WAR files to an application server's :file:`webapps` directory. You may have to restart the container service afterwards. Otherwise, please see your application server's instructions for further information on deploying web applications.
+#. Restart Tomcat (or just GeoServer).
 
-The following sections will assume that Tomcat is used, although most of the instructions and recommended strategies will also apply to other application servers with minimal alterations.
-
-#. Stop the application server.
-
-#. Increase the memory made available to your application server. Increase both the heap space (used for data) and the PermGen space (used to load web applications).
-
-   For tomcat these settings are provided by:
-   
-   * Linux: Create a :file:`$CATALINA_BASE/bin/setenv.sh`:
-      
-     .. code-block:: sh
-     
-        export CATALINA_OPTS = "-Xmx1024m -XX:MaxPermSize=128m"
-        
-   * Windows: Create a :file:`setenv.bat` on windows:
-      
-     .. code-block:: bat
-        
-        set CATALINA_OPTS = "-Xmx1024m -XX:MaxPermSize=128m"
-     
-     As an alternative you can configure these settings in the Tomcat Properties available in the from the task bar.
-     
-     * :guilabel:`Java Options`: append :kbd:`-XX:MaxPermSize=128m`
-     * :guilabel:`Maxium memory pool: :kbd:`2014` MB
-     
-     .. figure:: img/tomcat-windows.png
-        
-        Tomcat 8.0 Properties : Java Options and Memory Pool
-
-#. Locate the folder used to deploy web applications. For Tomcat this folder is called :file:`webapps`.
-
-#. Copy the OpenGeo Suite web applications as needed into the :file:`webapps` folder:
-
-   * dashboard.war
-   * geoserver.war
-   * geoexplorer.war
-   * geowebcache.war
-   
-#. Unzip opengeo-docs.zip into the :file:`webapps` folder:
-
-  * opengeo-docs
-
-#. Out of the box geoserver includes a built-in data directory used to manage configuration information.
-   
-   To facilitate updating, and for application serves that empty out the webapps folder each restart, we will move to an external data directory configuration.
-   
-   Copy the :file:`geoserver/WEB-INF/data` folder to an external location:
-   
-   * linux: :file:`/var/lib/opengeo/geoserver`
-   * windows: :file:`C:\\ProgramData\\Boundless\\OpenGeo\\geoserver`
-   * osx: :file:`/Users/opengeo/geoserver_data`
-
-#. Locate :file:`geoserver/WEB-INF/web.xml` and change the GEOSERVER_DATA_DIRECTORY configuration to point to the new location.
-
-#. In the same fashion update :file:`geowebcache/WEB_INF/web.xml` to point to a distinct cache location.
-
-Installation strategies
------------------------
-
-The main benefit of the application server bundle is its flexibility. It is up to you determine the exact deployment that suits your needs. The following describes some common deployment scenarios.
-
-Sandbox
-~~~~~~~
-
-If your application server is configured to sandbox web applications, you will need to grant additional permissions allowing GeoServer and GeoWebCache access to both Environmental variables and the File System. These permissions are used to locate the GEOSERVER_DATA_DIRECTORY.
-  
-For Tomcat locate the :file:`$CATALINA_BASE/conf/catalina.policy` file and add:
-  
-.. code-block:: ini
-  
-   # OpenGeo Suite permissions used to access Env Variables and GEOSERVER_DATA_DIRECTORY
-   grant codeBase "file:${catalina.base}/webapps/geoserver/WEB-INF/libs/-" {
-      permission java.security.AllPermission;
-   };
-   grant codeBase "file:${catalina.base}/geowebcache/geoserver/WEB-INF/libs/-" {
-      permission java.security.AllPermission;
-   };
-  
-Start tomcat with the ``-security`` option to use :file:`catalina.policy`.
-
-Split GeoServer and GeoWebCache
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-GeoWebCache can act as a proxy between GeoServer and a client. It may be advantageous to place GeoWebCache in an public facing servlet container, as it only hosts images and contains no data. You can then host GeoServer in a non-public facing implementation such that only GeoWebCache can access it. This provides a level of isolation for your data, limiting direct data access. 
-
-Multiple GeoServers
-~~~~~~~~~~~~~~~~~~~
-
-It is possible to deploy multiple copies of GeoServer in the same application server. This may be used to implement a "round robin" strategy for handling requests. You could go further and use multiple application servers to host GeoServer instances, making your system more fault tolerant.
-
-For information on this approach see the section on clustering.
-
-Separate PostGIS and GeoServer
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A recommended installation strategy is to ensure PostGIS and GeoServer are not installed on the same server. This is primarily for security reasons, to prevent PostGIS from being accessed via the web. Give that PostGIS is a separate installation from the WAR bundle, this configuration is straightforward to implement.
