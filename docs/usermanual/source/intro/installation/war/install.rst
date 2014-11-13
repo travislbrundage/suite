@@ -121,7 +121,7 @@ GeoServer includes a built-in data directory used to manage configuration inform
 
 #. Stop Tomcat (or just GeoServer).
 
-#. Move the :file:`geoserver/WEB-INF/data` directory to an external location. Here are some suggested locations:
+#. Move the :file:`geoserver/data` directory to an external location. Here are some suggested locations:
    
    * **Linux**: :file:`/var/lib/opengeo/geoserver`
    * **Windows**: :file:`C:\\ProgramData\\Boundless\\OpenGeo\\geoserver`
